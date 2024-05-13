@@ -58,6 +58,7 @@ generation_list = {
     'Galar': [8],
     'Paldea': [9]
 }
+
 regionInfoStr = []
 for region in starter_list.keys():
     
