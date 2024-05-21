@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import include, path
 from query import views as query_views
 
+# query.urls here includes the app's URL patterns defined in query/urls.py
 urlpatterns = [
     path("query/", include("query.urls")),
     path("admin/", admin.site.urls),

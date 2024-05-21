@@ -14,28 +14,33 @@ class Abilities(models.Model):
     description = models.TextField(blank=True, null=True)
     num_holders = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+    
     class Meta:
         managed = False
         db_table = 'abilities'
-
+        verbose_name_plural = 'Abilities'
 
 class LearnedByLeveling(models.Model):
-    pokemon_id = models.ForeignKey('Pokedex', models.DO_NOTHING, blank=True, null=True)
-    move_id = models.ForeignKey('Moves', models.DO_NOTHING, blank=True, null=True)
+    pokemon = models.OneToOneField('Pokedex', on_delete = models.DO_NOTHING, blank = True, primary_key = True)
+    move = models.ForeignKey('Moves', models.DO_NOTHING, blank=True, null=True)
     level_learned = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'learned_by_leveling'
+        verbose_name_plural = 'Learned By Leveling'
 
 
 class LearnedByTm(models.Model):
-    pokemon_id = models.ForeignKey('Pokedex', models.DO_NOTHING, blank=True, null=True)
-    move_id = models.ForeignKey('Moves', models.DO_NOTHING, blank=True, null=True)
+    pokemon = models.OneToOneField('Pokedex', on_delete = models.DO_NOTHING, blank = True, primary_key = True)
+    move = models.ForeignKey('Moves', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'learned_by_tm'
+        verbose_name_plural = 'Learned By TM'
 
 
 class Moves(models.Model):
@@ -48,9 +53,13 @@ class Moves(models.Model):
     pp = models.TextField(blank=True, null=True)
     effect = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+    
     class Meta:
         managed = False
         db_table = 'moves'
+        verbose_name_plural = 'Moves'
 
 
 class NotableTrainers(models.Model):
@@ -61,9 +70,13 @@ class NotableTrainers(models.Model):
     trainer_class = models.CharField(max_length=50, blank=True, null=True)
     type = models.CharField(max_length=20, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         managed = False
         db_table = 'notable_trainers'
+        verbose_name_plural = 'Notable Trainers'
 
 
 class Pokedex(models.Model):
@@ -81,27 +94,33 @@ class Pokedex(models.Model):
     entry = models.TextField(blank=True, null=True)
     generation = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         managed = False
         db_table = 'pokedex'
+        verbose_name_plural = 'Pokedex'
 
 
 class PokemonAbilities(models.Model):
-    pokemon = models.ForeignKey(Pokedex, models.DO_NOTHING, blank=True, null=True)
-    ability = models.ForeignKey(Abilities, models.DO_NOTHING, blank=True, null=True)
+    pokemon = models.OneToOneField('Pokedex', on_delete = models.DO_NOTHING, blank = True, primary_key = True)
+    ability = models.ForeignKey('Abilities', on_delete = models.DO_NOTHING, blank=True)
 
     class Meta:
         managed = False
         db_table = 'pokemon_abilities'
+        verbose_name_plural = 'Pokemon Abilities'
 
 
 class PokemonRegion(models.Model):
-    pokemon_id = models.ForeignKey(Pokedex, models.DO_NOTHING, blank=True, null=True)
-    region_id = models.ForeignKey('Regions', models.DO_NOTHING, blank=True, null=True)
+    pokemon = models.OneToOneField('Pokedex', on_delete = models.DO_NOTHING, blank = True, primary_key = True)
+    region = models.ForeignKey('Regions', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'pokemon_region'
+        verbose_name_plural = 'Pokemon Regions'
 
 
 class Regions(models.Model):
@@ -109,10 +128,14 @@ class Regions(models.Model):
     region_name = models.CharField(max_length=20, blank=True, null=True)
     professor_name = models.CharField(max_length=20, blank=True, null=True)
     generations = ArrayField(models.TextField(blank=True, null=True))
-    grass_starter_id = models.ForeignKey(Pokedex, models.DO_NOTHING, blank=True, null=True)
-    water_starter_id = models.ForeignKey(Pokedex, models.DO_NOTHING, related_name='regions_water_starter_set', blank=True, null=True)
-    fire_starter_id = models.ForeignKey(Pokedex, models.DO_NOTHING, related_name='regions_fire_starter_set', blank=True, null=True)
+    grass_starter = models.ForeignKey(Pokedex, models.DO_NOTHING, blank=True, null=True)
+    water_starter = models.ForeignKey(Pokedex, models.DO_NOTHING, related_name='regions_water_starter_set', blank=True, null=True)
+    fire_starter = models.ForeignKey(Pokedex, models.DO_NOTHING, related_name='regions_fire_starter_set', blank=True, null=True)
 
+    def __str__(self):
+        return self.region_name
+    
     class Meta:
         managed = False
         db_table = 'regions'
+        verbose_name_plural = 'Regions'

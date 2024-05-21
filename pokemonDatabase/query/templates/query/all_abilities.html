@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>List of All Abilities</title>
+    </head>
+    <body>
+        <h1>Ability List</h1>
+        <ul>
+            {% for ability in ability_list %}
+                <li>{{ ability.name }}</li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

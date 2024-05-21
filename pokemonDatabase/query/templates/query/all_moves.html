@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>List of All Moves</title>
+    </head>
+    <body>
+        <h1>Move List</h1>
+        <ul>
+            {% for move in move_list %}
+                <li>{{ move.name }}</li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import Pokedex, Abilities, Moves
 # contains Python functions called view functions that handle HTTP requests and return
 # HTTP responses
 
@@ -21,3 +22,19 @@ def index(request):
 
 # in urls.py we do the crucial step of URL routing - URL patterns that map to specific view
 # functions
+
+# first we create a view function to display all of the pokemon
+
+def all_pokemon(request):
+    pokemon_list = Pokedex.objects.all()
+    return render(request, 'query/all_pokemon.html',{'pokemon_list' : pokemon_list})
+    
+    
+def all_abilities(request):
+    ability_list = Abilities.objects.all()
+    return render(request, 'query/all_abilities.html',{'ability_list' : ability_list})
+    
+
+def all_moves(request):
+    move_list = Moves.objects.all()
+    return render(request, 'query/all_moves.html', {'move_list' : move_list})
