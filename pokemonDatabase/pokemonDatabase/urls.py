@@ -22,5 +22,5 @@ from query import views as query_views
 urlpatterns = [
     path("query/", include("query.urls")),
     path("admin/", admin.site.urls),
-    path("", query_views.index, name = 'index')
+    path("", query_views.index, name = 'index'),
 ]

@@ -6,6 +6,8 @@ urlpatterns = [
     path("pokemon_list/", views.all_pokemon, name = 'pokemon_list'),
     path("abilities_list/", views.all_abilities, name = 'ability_list'),
     path("move_list/", views.all_moves, name = 'move_list'),
+    path("filter_list/", views.filter_pokemon, name = 'filter_list'),
+    path('autocomplete/ability/', views.autocomplete_ability, name = 'autocomplete_ability'),
 ]
 
 # first argument is a URL path - in this case it matches the root URL

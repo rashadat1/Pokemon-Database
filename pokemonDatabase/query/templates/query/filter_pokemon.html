@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filtered Pokemon Tool</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="./filter_pokemon.css">
+</head>
+
+<body>
+    <h1>Filter Pokemon</h1>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Filter</button>
+    </form>
+    
+
+
+    <h2>Pokemon List</h2>
+
+        {% if pokemon_list %}
+            <ul>
+                {% for pokemon in pokemon_list %}
+                    <li>
+                        <strong>Name:</strong> {{ pokemon.name }}<br>
+                        <strong>Type:</strong> {{ pokemon.type|join:", "}}<br>
+                        <strong>Total:</strong> {{ pokemon.total }}<br>
+                        <strong>HP:</strong> {{ pokemon.hp }}<br>
+                        <strong>Attack:</strong> {{ pokemon.atk }}<br>
+                        <strong>Defense:</strong> {{ pokemon.def_field}}<br>
+                        <strong>Special Attack:</strong> {{ pokemon.spatk }}<br>
+                        <strong>Special Defense:</strong> {{ pokemon.spdef }}<br>
+                        <strong>Speed:</strong> {{ pokemon.spd }}<br>
+                        <br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No Pokemon match the selected criteria.</p>
+        {% endif %}
+
+        <script>
+            $(function() {
+                $(".autocomplete").autocomplete({
+                    source: function(request, response) {
+                        $.ajax({
+                            url: "{% url 'autocomplete_ability' %}",
+                            dataType: "json",
+                            data: {
+                                term: request.term
+                            },
+                            success: function(data) {
+                                response(data);
+                            }
+                        });
+                    },
+                    minLength: 2
+                });
+            });
+        </script>
+</body>
+</html>
