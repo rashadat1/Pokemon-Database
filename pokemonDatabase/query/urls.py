@@ -8,6 +8,8 @@ urlpatterns = [
     path("move_list/", views.all_moves, name = 'move_list'),
     path("filter_list/", views.filter_pokemon, name = 'filter_list'),
     path('autocomplete/ability/', views.autocomplete_ability, name = 'autocomplete_ability'),
+    path('stat_calculator/', views.StatCalculatorTool, name = 'statcalculator'),
+    path('autocomplete/pokemon/', views.autocomplete_pokemon, name = 'autocomplete_pokemon')
 ]
 
 # first argument is a URL path - in this case it matches the root URL

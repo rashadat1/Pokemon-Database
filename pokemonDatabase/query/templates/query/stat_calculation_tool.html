@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stat Calculator Tool</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="./stat_calculator.css">
+</head>
+
+<body>
+    <h1>Pokemon Stat Calculator</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Calculate Stats</button>
+    </form>
+    
+    {% if form.errors %}
+        <div class="form-errors">
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    
+    {% if stats %}
+        <h2>Calculated Stats</h2>
+        <ul>
+            <li><strong>HP:</strong> {{ stats.hp }}</li>
+            <li><strong>Attack:</strong> {{ stats.atk }}</li>
+            <li><strong>Defense:</strong> {{ stats.def }}</li>
+            <li><strong>Special Attack:</strong> {{ stats.spatk }}</li>
+            <li><strong>Special Defense:</strong> {{ stats.spdef }}</li>
+            <li><strong>Speed:</strong> {{ stats.spd }}</li>
+        </ul>
+    {% endif %}
+
+    <script>
+        $(function() {
+            $(".autocomplete").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: "{% url 'autocomplete_pokemon' %}",
+                        dataType: "json",
+                        type: "POST",
+                        data: {
+                            term: request.term,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 2
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Pokedex, Abilities, Moves
-from .forms import PokemonFilterForm
+from .forms import PokemonFilterForm, StatCalculatorForm
 from django.http import JsonResponse
+from math import floor
 
 # contains Python functions called view functions that handle HTTP requests and return
 # HTTP responses
@@ -105,8 +106,79 @@ def filter_pokemon(request):
         
         
     return render(request, 'query/filter_pokemon.html', {'form' : form, 'pokemon_list' : pokemon_list, 'errors' : errors})
-        
+
+
+def nature_modifier(nature, stat):
+    nature_increase = {
+        'Lonely': 'atk', 'Brave': 'atk', 'Adamant': 'atk', 'Naughty': 'atk',
+        'Bold': 'def', 'Relaxed': 'def', 'Impish': 'def', 'Lax': 'def',
+        'Modest': 'spatk', 'Mild': 'spatk', 'Quiet': 'spatk', 'Rash': 'spatk',
+        'Calm': 'spdef', 'Gentle': 'spdef', 'Sassy': 'spdef', 'Careful': 'spdef',
+        'Timid': 'spd', 'Hasty': 'spd', 'Jolly': 'spd', 'Naive': 'spd'
+    }
+    
+    nature_decrease = {
+        'Lonely': 'def', 'Brave': 'spd', 'Adamant': 'spatk', 'Naughty': 'spdef',
+        'Bold': 'atk', 'Relaxed': 'spd', 'Impish': 'spatk', 'Lax': 'spdef',
+        'Modest': 'atk', 'Mild': 'def', 'Quiet': 'spd', 'Rash': 'spdef',
+        'Calm': 'atk', 'Gentle': 'def', 'Sassy': 'spd', 'Careful': 'spatk',
+        'Timid': 'atk', 'Hasty': 'def', 'Jolly': 'spatk', 'Naive': 'spdef'
+    }
+    
+    if nature_increase.get(nature) == stat:
+        return 1.1
+    
+    elif nature_decrease.get(nature) == stat:
+        return 0.9
+    
+    else:
+        return 1.0   
+
+def calculate_hp(base, iv, ev, level):
+    return int((((2 * base + iv + (ev // 4)) * level) // 100) + level + 10)
+    
+def calculate_otherstats(base, iv, ev, level, nature_mod):
+    return int(((((2 * base + iv + (ev // 4)) * level) // 100) + 5) * nature_mod)
+    
+
+def StatCalculatorTool(request):
+    if request.method == 'POST':
+        form = StatCalculatorForm(request.POST)
+        if form.is_valid():
+            pokemon = form.cleaned_data['pokemon_name']
+            level = form.cleaned_data['level']
+            nature = form.cleaned_data['nature']
+            ivs = {
+                'hp' : form.cleaned_data['hp_iv'],
+                'atk' : form.cleaned_data['atk_iv'], 
+                'def' : form.cleaned_data['def_iv'],
+                'spatk' : form.cleaned_data['spatk_iv'],
+                'spdef' : form.cleaned_data['spdef_iv'],
+                'spd' : form.cleaned_data['spd_iv']}
             
+            evs = {
+                'hp' : form.cleaned_data['hp_ev'],
+                'atk' : form.cleaned_data['atk_ev'], 
+                'def' : form.cleaned_data['def_ev'],
+                'spatk' : form.cleaned_data['spatk_ev'],
+                'spdef' : form.cleaned_data['spdef_ev'],
+                'spd' : form.cleaned_data['spd_ev']}
+            
+            stats = {
+                'hp' : calculate_hp(pokemon.hp, ivs['hp'], evs['hp'], level),
+                'atk' : calculate_otherstats(pokemon.atk, ivs['atk'], evs['atk'], level, nature_modifier(nature,'atk')),
+                'def' : calculate_otherstats(pokemon.def_field, ivs['def'], evs['def'], level, nature_modifier(nature,'def')),
+                'spatk' : calculate_otherstats(pokemon.spatk, ivs['spatk'], evs['spatk'], level, nature_modifier(nature,'spatk')),
+                'spdef' : calculate_otherstats(pokemon.spdef, ivs['spdef'], evs['spdef'], level, nature_modifier(nature,'spdef')),
+                'spd' : calculate_otherstats(pokemon.spd, ivs['spd'], evs['spd'], level, nature_modifier(nature,'spd'))
+            }
+            
+            return render(request, 'query/stat_calculation_tool.html', {'stats' : stats, 'pokemon' : pokemon})        
+    else:
+        form = StatCalculatorForm()
+    return render(request, 'query/stat_calculation_tool.html', {'form' : form})
+    
+    
 def autocomplete_ability(request):
     if 'term' in request.GET:
         # checks if there is a user typed word 'term' in the GET request
@@ -115,6 +187,15 @@ def autocomplete_ability(request):
         names = list(qs.values_list('name',flat=True))
         return JsonResponse(names, safe=False)
     return JsonResponse([], safe=False)
+
+
+def autocomplete_pokemon(request):
+    if 'term' in request.POST:
+        qs = Pokedex.objects.filter(name__icontains = request.POST.get('term'))
+        names = list(qs.values_list('name',flat=True))
+        return JsonResponse(names, safe=False)
+    return JsonResponse([], safe=False)
+
 
 
         
