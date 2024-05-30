@@ -59,8 +59,8 @@ Use the provided Python scripts for web scraping and data manipulation.\
 
 5. **Apply the migrations**:
     ```bash
-    1. python manage.py makemigrations
-    2. python manage.py migrate
+    python manage.py makemigrations
+    python manage.py migrate
     ```
 
 6. **Create a superuser**:
@@ -76,4 +76,6 @@ Use the provided Python scripts for web scraping and data manipulation.\
 9. **Open your web browser and navigate to**:
     ```
     http://127.0.0.1:8000/
+    pokemon filter : http://127.0.0.1:8000/query/filter_list/
+    stat calculator : http://127.0.0.1:8000/query/stat_calculator/
     ```
