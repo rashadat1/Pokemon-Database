@@ -63,11 +63,13 @@ pokemon_rows = soup.find_all('table', id = 'pokedex')[0].find_all('tbody')[0].fi
 pokedex_data = []
 
 conn = psycopg2.connect(database = 'pokemondb',
-                        user = 'tarikrashada')
+                        user = 'tarikrashada',
+                        password='PostGresSenpai',
+                        port = 5431)
 
 cursor = conn.cursor()
 
-
+'''
 for i in range(len(pokemon_rows)):
     
     pokemon_row_dict = {}
@@ -182,7 +184,8 @@ for i in range(len(pokemon_rows)):
 # the pokedex entries table
 #print(entry_text) # = 13
 
-
+'''
+"""
 create_table_query = '''
     CREATE TABLE IF NOT EXISTS POKEDEX (
         id SERIAL PRIMARY KEY,
@@ -218,7 +221,7 @@ if count == 0:
     conn.commit()
 else:
     print('POKEDEX table already exists.')
-
+"""
 create_table_query = '''
     CREATE TABLE IF NOT EXISTS POKEMON_ABILITIES (
         pokemon_id INT,
@@ -259,12 +262,22 @@ for i in range(len(pokemon_rows)):
         entry_url,
         headers = {'User-Agent': 'Mozilla/5.0'}
     )
+    
     entry_page_html = urlopen(request).read().decode('utf-8')
     
     # entry_soup is giving whole page for a particular pokemon
     entry_soup = BeautifulSoup(entry_page_html,'html.parser')
     ability_list_search = entry_soup.find_all('main')[0].find_all('div',{'class' : 'grid-col span-md-6 span-lg-4'})[0]
-
+    
+    hidden_search = ability_list_search.find_all('table',{'class' : 'vitals-table'})[0].find_all('tbody')[0].find_all('tr')[5].find_all('td')[0]
+    hidden_array = []
+    if len(hidden_search) > 0:
+        hidden_ability = hidden_search.find_all('small')
+        if len(hidden_ability) > 0:
+            for i in range(len(hidden_ability)):
+                hidden_array.append(hidden_ability[i].getText().split(' (')[0])
+                print(hidden_ability[i].getText().split(' (')[0])
+    """
     for ability in ability_list_search.find_all('table',{'class' : 'vitals-table'})[0].find_all('tbody')[0].find_all('tr')[5].find_all('td')[0].find_all('span'):
         
         print(name)
@@ -280,15 +293,21 @@ for i in range(len(pokemon_rows)):
         query3 = 'INSERT INTO POKEMON_ABILITIES (pokemon_id, ability_id) VALUES (%s, %s)'
         cursor.execute(query3, (PokemonID[0], AbilityID[0]))
         conn.commit()
+    """
+    for ability in hidden_array:
+        query = 'SELECT id FROM POKEDEX WHERE NAME = %s'
+        cursor.execute(query, (name,))
+        PokemonID = cursor.fetchone()
         
-
-
+        ability_name = ability
+        query2 = 'SELECT id FROM ABILITIES WHERE NAME = %s'
+        cursor.execute(query2, (ability_name,))
+        AbilityID = cursor.fetchone()
+        
+        query3 = 'INSERT INTO POKEMON_ABILITIES (pokemon_id, ability_id) VALUES (%s, %s)'
+        cursor.execute(query3, (PokemonID[0], AbilityID[0]))
+        conn.commit()
+        
 conn.commit()
 cursor.close()
 conn.close()
-'''
-select name from POKEDEX where id in (select pokemon_id from pokemon_abilities where ability_id = (select id from ABILITIES where NAME = 'Arena Trap'))
-
-
-select p.name, a."name"  from pokedex p, pokemon_abilities pa, abilities a where p.id = pa.pokemon_id and pa.ability_id = a.id and a."name" = 'Arena Trap';
-'''

@@ -1,7 +1,7 @@
 from django import forms
 from .models import Pokedex, Regions, Abilities, Moves
 from .models import LearnedByLeveling, LearnedByTm, PokemonAbilities, PokemonRegion
-
+import uuid
 
 GENERATION_CHOICES = [(i,str(i)) for i in range(1,10)]
 TYPE_CHOICES = [
@@ -57,7 +57,11 @@ class PokemonFilterForm(forms.Form):
             
 
 class StatCalculatorForm(forms.Form):
-    pokemon_name = forms.CharField(required=True, label='Pokemon', widget=forms.TextInput(attrs={'class': 'autocomplete'}))
+    
+    def get_random_string():
+        return str(uuid.uuid4()).replace('-','')
+    
+    pokemon_name = forms.CharField(required=True, label='Pokemon', widget=forms.TextInput(attrs={'class': 'autocomplete', 'autocomplete' : 'off', 'name' : get_random_string(), 'id' : get_random_string()}))
     level = forms.IntegerField(required=True, label='Level', min_value=1, max_value=100)
     nature = forms.ChoiceField(required=True, choices=NATURE_CHOICES, label='Nature')
     
@@ -84,8 +88,8 @@ class StatCalculatorForm(forms.Form):
                 raise forms.ValidationError("Invalid Pokemon selected")
         return None
     
-    def clean_EVs(self):
-        cleaned_data = super().clean_EVs()
+    def clean(self):
+        cleaned_data = super().clean()
         
         hp_ev = self.cleaned_data.get('hp_ev')
         atk_ev = self.cleaned_data.get('atk_ev')
@@ -97,4 +101,5 @@ class StatCalculatorForm(forms.Form):
         total_EVs = hp_ev + atk_ev + def_ev + spatk_ev + spdef_ev + spd_ev
         if total_EVs > 510:
             raise forms.ValidationError(f"Invalid EV Spread. The sum of this pokemon's EVs is {total_EVs} which exceeds the limit of 510")
-        return cleaned_data
+        else:
+            return cleaned_data

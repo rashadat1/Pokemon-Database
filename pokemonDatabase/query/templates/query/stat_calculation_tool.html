@@ -10,23 +10,12 @@
 
 <body>
     <h1>Pokemon Stat Calculator</h1>
-    <form method="post">
+    <form method="post" autocomplete="off">
         {% csrf_token %}
+        <input type="text" style="display:none;">
         {{ form.as_p }}
         <button type="submit">Calculate Stats</button>
     </form>
-    
-    {% if form.errors %}
-        <div class="form-errors">
-            <ul>
-                {% for field, errors in form.errors.items %}
-                    {% for error in errors %}
-                        <li>{{ field }}: {{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
     
     {% if stats %}
         <h2>Calculated Stats</h2>
